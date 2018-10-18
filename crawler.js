@@ -3,6 +3,7 @@ const request = require('request');
 const cheerio = require('cheerio');
 const assert = require('assert');
 const MongoClient = require('mongodb').MongoClient;
+
 const url = 'mongodb://127.0.0.1:27017';
 
 const putData = (data) => {
