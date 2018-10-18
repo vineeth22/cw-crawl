@@ -23,47 +23,45 @@ const getData = (pageNumber, func) => {
     if (error) {
       console.log('error:', error);
     }
-
-    var jsonBody = JSON.parse(body);
-    var $ = cheerio.load(jsonBody.listing);
-    var count = [];
+    const jsonBody = JSON.parse(body);
+   const $ = cheerio.load(jsonBody.listing);
+    const count = [];
     count.head_title = 0;
     count.location_distance = 0;
     count.number_rating = 0;
     count.yrs_exp = 0;
     count.per_votes = 0;
     count.txt_votes = 0;
-    var data = [];
+    const data = [];
 
-    $('.head_title').each(() => {
+    $('.head_title').each(function () {
       if (!data[count.head_title]) {
         data.push({});
       }
-      console.log($(this).text());
       data[count.head_title++].head_title = $(this).text();
     });
-    $('.location_distance').each(() => {
+    $('.location_distance').each(function () {
       if (!data[count.location_distance]) {
         data.push({});
       }
       data[count.location_distance++].location_distance = $(this).text();
     });
 
-    $('.number_rating').each(() => {
+    $('.number_rating').each(function () {
       if (!data[count.number_rating]) {
         data.push({});
       }
       data[count.number_rating++].number_rating = $(this).text();
     });
 
-    $('.yrs_exp').each(() => {
+    $('.yrs_exp').each(function () {
       if (!data[count.yrs_exp]) {
         data.push({});
       }
       data[count.yrs_exp++].yrs_exp = $(this).text();
     });
 
-    $('.per_votes').each(() => {
+    $('.per_votes').each(function () {
       if (!data[count.per_votes]) {
         data.push({});
       }
@@ -89,12 +87,9 @@ const crawl = () => {
   MongoClient.connect(url, function (err, client) {
     assert.equal(null, err);
     const db = client.db('carworkz');
-    console.log("Connected correctly to server");
     var collection = db.collection('service');
-    // Find some documents
     collection.drop(function (err, docs) {
       assert.equal(err, null);
-      //console.log(docs);
       client.close();
       
       getPageCount((pageCount) => {
