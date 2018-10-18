@@ -26,7 +26,7 @@ MongoClient.connect(url, function(err, client) {
   });
 });
 
-const byName = (text) => {
+const byName = (text, func) => {
   MongoClient.connect(url, function(err, client) {
     assert.equal(null, err);
     const db = client.db('carworkz');
@@ -36,15 +36,15 @@ const byName = (text) => {
     collection.find({ '$text': {'$search' : text } } ).toArray(function(err, docs) {
       assert.equal(err, null);
       console.log("Found the following records");
-      console.log(docs);
       client.close();
+      func(docs);
     });      
   }); 
 }
 
 
 
-const byLocation = (text) => {
+const byLocation = (text, func) => {
   MongoClient.connect(url, function(err, client) {
     assert.equal(null, err);
     const db = client.db('carworkz');
@@ -54,13 +54,13 @@ const byLocation = (text) => {
     collection.find({ location_distance : text} ).toArray(function(err, docs) {
       assert.equal(err, null);
       console.log("Found the following records");
-      console.log(docs);
       client.close();
+      func(docs);
     });      
   }); 
 } 
 
-const byRating = (text) => {
+const byRating = (text, func) => {
   MongoClient.connect(url, function(err, client) {
     assert.equal(null, err);
     const db = client.db('carworkz');
@@ -70,11 +70,31 @@ const byRating = (text) => {
     collection.find({ number_rating : text} ).toArray(function(err, docs) {
       assert.equal(err, null);
       console.log("Found the following records");
-      console.log(docs);
       client.close();
+      func(docs);
     });      
   }); 
 } 
 
-
+const getService = (func) => {
+  MongoClient.connect(url, function(err, client) {
+    assert.equal(null, err);
+    const db = client.db('carworkz');
+    console.log("Connected correctly to server");
+    var collection = db.collection('service');
+    // Find some documents
+    collection.find().toArray(function(err, docs) {
+      assert.equal(err, null);
+      console.log("Found the following records");
+      //console.log(docs);
+      client.close();
+      func(docs)
+    });      
+  }); 
+}
 //byRating('5')
+
+module.exports.getService = getService;
+module.exports.byName = byName;
+module.exports.byRating = byRating;
+module.exports.byLocation = byLocation;

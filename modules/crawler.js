@@ -24,22 +24,22 @@ const getData = (pageNumber, func) => {
       console.log('error:', error);
     }
 
-    const jsonBody = JSON.parse(body);
-    const $ = cheerio.load(jsonBody.listing);
-
-    const count = [];
+    var jsonBody = JSON.parse(body);
+    var $ = cheerio.load(jsonBody.listing);
+    var count = [];
     count.head_title = 0;
     count.location_distance = 0;
     count.number_rating = 0;
     count.yrs_exp = 0;
     count.per_votes = 0;
     count.txt_votes = 0;
-    const data = [];
+    var data = [];
 
     $('.head_title').each(() => {
       if (!data[count.head_title]) {
         data.push({});
       }
+      console.log($(this).text());
       data[count.head_title++].head_title = $(this).text();
     });
     $('.location_distance').each(() => {
@@ -67,9 +67,9 @@ const getData = (pageNumber, func) => {
       if (!data[count.per_votes]) {
         data.push({});
       }
-      data[count.per_votes++].per_votes = $(this).text();
+      data[count.per_votes++].per_votes = $(this).text().trim();
     });
-
+    //console.log(data);
     func(data);
   });
 };
@@ -86,11 +86,27 @@ const getPageCount = (func) => {
 };
 
 const crawl = () => {
-  getPageCount((pageCount) => {
-    for (let i = 1; i <= pageCount; i++) {
-      getData(i, (data) => {
-        putData(data);
+  MongoClient.connect(url, function (err, client) {
+    assert.equal(null, err);
+    const db = client.db('carworkz');
+    console.log("Connected correctly to server");
+    var collection = db.collection('service');
+    // Find some documents
+    collection.drop(function (err, docs) {
+      assert.equal(err, null);
+      //console.log(docs);
+      client.close();
+      
+      getPageCount((pageCount) => {
+        for (let i = 1; i <= pageCount; i++) {
+          getData(i, (data) => {
+            putData(data);
+          });
+        }
       });
-    }
+    });
   });
 }
+
+module.exports.crawl = crawl;
+
